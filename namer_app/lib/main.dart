@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -236,16 +235,38 @@ class _MovieTileState extends State<_MovieTile> {
   }
 }
 
-class MovieDetailPage extends StatelessWidget {
+class MovieDetailPage extends StatefulWidget { // Zmieniono z StatelessWidget na StatefulWidget
   final Movie movie;
 
   const MovieDetailPage({required this.movie, Key? key}) : super(key: key);
 
   @override
+  State<MovieDetailPage> createState() => _MovieDetailPageState();
+}
+
+class _MovieDetailPageState extends State<MovieDetailPage> {
+  int correctAnswers = 0;
+  int totalAnswered = 0;
+  bool quizCompleted = false;
+
+  void _handleAnswer(bool isCorrect) {
+    setState(() {
+      if (isCorrect) {
+        correctAnswers++;
+      }
+      totalAnswered++;
+      
+      if (totalAnswered == widget.movie.quiz.length) {
+        quizCompleted = true;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(movie.title),
+        title: Text(widget.movie.title),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -255,30 +276,104 @@ class MovieDetailPage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                movie.imagePath,
+                widget.movie.imagePath,
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              movie.longDescription,
+              widget.movie.longDescription,
               style: const TextStyle(
                 fontSize: 16,
                 color: Color(0xFF000000),
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
-              'Quiz:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF000000),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Quiz:',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF000000),
+                  ),
+                ),
+                Text(
+                  '$correctAnswers/${widget.movie.quiz.length} correct answers',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF000000),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            ...movie.quiz.map((q) => QuizQuestionWidget(question: q)).toList(),
+            // Pytania quizu
+            ...widget.movie.quiz.map((q) => QuizQuestionWidget(
+              question: q,
+              onAnswerSelected: _handleAnswer,
+            )).toList(),
+            
+            if (quizCompleted)
+              Container(
+                margin: const EdgeInsets.only(top: 24),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFffe648),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Quiz finished!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF030154),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Your score: $correctAnswers/${widget.movie.quiz.length}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF030154),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Percentage of correct answers: ${(correctAnswers / widget.movie.quiz.length * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF030154),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF030154),
+                      ),
+                      child: const Text('Go back to the home page'),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -289,8 +384,13 @@ class MovieDetailPage extends StatelessWidget {
 
 class QuizQuestionWidget extends StatefulWidget {
   final QuizQuestion question;
+  final Function(bool isCorrect) onAnswerSelected; // Dodany callback
 
-  const QuizQuestionWidget({required this.question, Key? key}) : super(key: key);
+  const QuizQuestionWidget({
+    required this.question, 
+    required this.onAnswerSelected, // Wymagany nowy parametr
+    Key? key
+  }) : super(key: key);
 
   @override
   State<QuizQuestionWidget> createState() => _QuizQuestionWidgetState();
@@ -344,6 +444,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                     ? () {
                         setState(() {
                           selectedIndex = index;
+                          widget.onAnswerSelected(index == widget.question.correctAnswerIndex);
                         });
                       }
                     : null,
@@ -757,87 +858,44 @@ class MapPage extends StatelessWidget {
 
 // --- TABS ---
 
-class StreamingPage extends StatefulWidget {
+class StreamingPage extends StatelessWidget {
   const StreamingPage({super.key});
-
-  @override
-  State<StreamingPage> createState() => _StreamingPageState();
-}
-class _StreamingPageState extends State<StreamingPage>  {
-  final List<Map<String, String>> videos = [
-    {
-      'title': '27 Tips I Wish I Knew Before Visiting Porto, Portugal',
-      'url': 'https://www.youtube.com/embed/ZK5TyUqk22M',
-    },
-    {
-      'title': 'FC Porto Stadium Tour',
-      'url': 'https://www.youtube.com/embed/ztPQ0CIFJtI',
-    },
-    {
-      'title': 'Porto 4K drone view ',
-      'url': 'https://www.youtube.com/embed/7chyxBvCYd8 ',
-    },
-  ];
-
-  late YoutubePlayerController _controller;
-  String? selectedVideoId;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedVideoId = YoutubePlayer.convertUrlToId(videos[0]['url']!);
-    _controller = YoutubePlayerController(
-      initialVideoId: selectedVideoId!,
-      flags: const YoutubePlayerFlags(autoPlay: false),
-    );
-  }
-
-  void _loadVideo(String url) {
-    final videoId = YoutubePlayer.convertUrlToId(url);
-    if (videoId != null) {
-      setState(() {
-        selectedVideoId = videoId;
-        _controller.load(videoId);
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Streaming')),
-      body: Column(
-        children: [
-          YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: videos.length,
-              itemBuilder: (context, index) {
-                final video = videos[index];
-                return ListTile(
-                  title: Text(video['title']!),
-                  trailing: const Icon(Icons.play_arrow),
-                  onTap: () => _loadVideo(video['url']!),
-                );
-              },
-            ),
-          ),
-        ],
+      appBar: AppBar(
+        title: const Text('Streaming'),
+      ),
+      body: const Center(
+        child: Text(
+          'Streaming content coming soon!',
+          style: TextStyle(fontSize: 18, color: Colors.black),
+        ),
       ),
     );
   }
 }
 
+class PlaceholderStreamingPage extends StatelessWidget {
+  const PlaceholderStreamingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          "I don't know what to do here yet",
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.black,
+                fontSize: 20,
+              ),
+        ),
+      ),
+      backgroundColor: const Color(0xFFFFFFFF),
+    );
+  }
+}
 
 // --- HELPER FUNCTION ---
 
