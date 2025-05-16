@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -858,20 +860,82 @@ class MapPage extends StatelessWidget {
 
 // --- TABS ---
 
-class StreamingPage extends StatelessWidget {
+class StreamingPage extends StatefulWidget {
   const StreamingPage({super.key});
+
+  @override
+  State<StreamingPage> createState() => _StreamingPageState();
+}
+class _StreamingPageState extends State<StreamingPage>  {
+  final List<Map<String, String>> videos = [
+    {
+      'title': '27 Tips I Wish I Knew Before Visiting Porto, Portugal',
+      'url': 'https://www.youtube.com/embed/ZK5TyUqk22M',
+    },
+    {
+      'title': 'FC Porto Stadium Tour',
+      'url': 'https://www.youtube.com/embed/ztPQ0CIFJtI',
+    },
+    {
+      'title': 'Porto 4K drone view ',
+      'url': 'https://www.youtube.com/embed/7chyxBvCYd8 ',
+    },
+  ];
+
+  late YoutubePlayerController _controller;
+  String? selectedVideoId;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedVideoId = YoutubePlayer.convertUrlToId(videos[0]['url']!);
+    _controller = YoutubePlayerController(
+      initialVideoId: selectedVideoId!,
+      flags: const YoutubePlayerFlags(autoPlay: false),
+    );
+  }
+
+  void _loadVideo(String url) {
+    final videoId = YoutubePlayer.convertUrlToId(url);
+    if (videoId != null) {
+      setState(() {
+        selectedVideoId = videoId;
+        _controller.load(videoId);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Streaming'),
-      ),
-      body: const Center(
-        child: Text(
-          'Streaming content coming soon!',
-          style: TextStyle(fontSize: 18, color: Colors.black),
-        ),
+      appBar: AppBar(title: const Text('Streaming')),
+      body: Column(
+        children: [
+          YoutubePlayer(
+            controller: _controller,
+            showVideoProgressIndicator: true,
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView.builder(
+              itemCount: videos.length,
+              itemBuilder: (context, index) {
+                final video = videos[index];
+                return ListTile(
+                  title: Text(video['title']!),
+                  trailing: const Icon(Icons.play_arrow),
+                  onTap: () => _loadVideo(video['url']!),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
