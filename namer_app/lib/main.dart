@@ -866,7 +866,8 @@ class StreamingPage extends StatefulWidget {
   @override
   State<StreamingPage> createState() => _StreamingPageState();
 }
-class _StreamingPageState extends State<StreamingPage>  {
+
+class _StreamingPageState extends State<StreamingPage> {
   final List<Map<String, String>> videos = [
     {
       'title': '27 Tips I Wish I Knew Before Visiting Porto, Portugal',
@@ -877,8 +878,8 @@ class _StreamingPageState extends State<StreamingPage>  {
       'url': 'https://www.youtube.com/embed/ztPQ0CIFJtI',
     },
     {
-      'title': 'Porto 4K drone view ',
-      'url': 'https://www.youtube.com/embed/7chyxBvCYd8 ',
+      'title': 'Porto 4K drone view',
+      'url': 'https://www.youtube.com/embed/7chyxBvCYd8',
     },
   ];
 
@@ -888,15 +889,21 @@ class _StreamingPageState extends State<StreamingPage>  {
   @override
   void initState() {
     super.initState();
-    selectedVideoId = YoutubePlayer.convertUrlToId(videos[0]['url']!);
+    final initialUrl = videos[0]['url']!.trim();
+    selectedVideoId = YoutubePlayer.convertUrlToId(initialUrl);
     _controller = YoutubePlayerController(
       initialVideoId: selectedVideoId!,
-      flags: const YoutubePlayerFlags(autoPlay: false),
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        enableCaption: false,
+        showLiveFullscreenButton: false
+      ),
     );
   }
 
   void _loadVideo(String url) {
-    final videoId = YoutubePlayer.convertUrlToId(url);
+    final videoId = YoutubePlayer.convertUrlToId(url.trim());
     if (videoId != null) {
       setState(() {
         selectedVideoId = videoId;
@@ -914,12 +921,22 @@ class _StreamingPageState extends State<StreamingPage>  {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Streaming')),
+      backgroundColor: Colors.indigo[900], // dark blue background
+      appBar: AppBar(
+        backgroundColor: Colors.indigo[800],
+        title: const Text(
+          'Streaming',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Column(
         children: [
           YoutubePlayer(
             controller: _controller,
             showVideoProgressIndicator: true,
+            progressIndicatorColor: Colors.redAccent,
+            
           ),
           const SizedBox(height: 10),
           Expanded(
@@ -927,36 +944,30 @@ class _StreamingPageState extends State<StreamingPage>  {
               itemCount: videos.length,
               itemBuilder: (context, index) {
                 final video = videos[index];
-                return ListTile(
-                  title: Text(video['title']!),
-                  trailing: const Icon(Icons.play_arrow),
-                  onTap: () => _loadVideo(video['url']!),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: ListTile(
+                    tileColor: Colors.indigo[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    title: Text(
+                      video['title']!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.play_arrow, color: Colors.white70),
+                    onTap: () => _loadVideo(video['url']!),
+                  ),
                 );
               },
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class PlaceholderStreamingPage extends StatelessWidget {
-  const PlaceholderStreamingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          "I don't know what to do here yet",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black,
-                fontSize: 20,
-              ),
-        ),
-      ),
-      backgroundColor: const Color(0xFFFFFFFF),
     );
   }
 }
