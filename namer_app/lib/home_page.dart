@@ -61,54 +61,55 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class HomeTabController extends StatelessWidget {
+class HomeTabController extends StatefulWidget {
   const HomeTabController({super.key});
+
+  @override
+  State<HomeTabController> createState() => _HomeTabControllerState();
+}
+
+class _HomeTabControllerState extends State<HomeTabController> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight + 56.0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color.fromARGB(255, 2, 1, 90),
-                  width: 6.0,
+          appBar: AppBar(
+            title: const Text('Your Local Quizzes'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 55),
+                child: IconButton(
+                  icon: const Icon(Icons.person),
+                  iconSize: 40,
+                  tooltip: 'Profile',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const UserProfilePage()),
+                    );
+                  },
                 ),
               ),
-              child: AppBar(
-                title: const Text('Your Local Quizzes'),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 55),
-                    child: IconButton(
-                      icon: const Icon(Icons.person),
-                      iconSize: 40,
-                      tooltip: 'Profile',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const UserProfilePage()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(text: '  Movies  '),
-                    Tab(text: '  Series  '),
-                    Tab(text: '  Places  '),
-                    Tab(text: '  Map  '),
-                    Tab(text: '  Streaming  '),
-                  ],
-                ),
-              ),
-            ),
+            ],
+            backgroundColor: const Color.fromARGB(255, 2, 1, 90),
           ),
           body: TabBarView(
+            controller: _tabController,
             children: [
               MoviePage(),
               SeriesPage(),
@@ -117,10 +118,35 @@ class HomeTabController extends StatelessWidget {
               const StreamingPage(),
             ],
           ),
+          bottomNavigationBar: Container(
+  height: 48, // <-- wyższy pasek
+  color: const Color.fromARGB(255, 2, 1, 90),
+  child: TabBar(
+    controller: _tabController,
+    tabs: const [
+      Tab(icon: Icon(Icons.movie)),
+      Tab(icon: Icon(Icons.tv)),
+      Tab(icon: Icon(Icons.place)),
+      Tab(icon: Icon(Icons.map)),
+      Tab(icon: Icon(Icons.stream)),
+    ],
+    labelColor: Colors.yellow,
+    unselectedLabelColor: Colors.white,
+    indicator: UnderlineTabIndicator(
+      borderSide: BorderSide(width: 4.0, color: Colors.yellow),
+      insets: EdgeInsets.symmetric(horizontal: 24.0),
+    ),
+  ),
+),
+
+
+
+
+
           backgroundColor: const Color(0xFFFFFFFF),
         ),
         Positioned(
-          top: 30, // Aangepaste waarde om uit te lijnen met titel en icoon
+          top: 30,
           right: 8,
           child: Image.asset(
             'assets/images/logo.png',
@@ -131,7 +157,12 @@ class HomeTabController extends StatelessWidget {
       ],
     );
   }
+
+
+
 }
+
+
 
 // --- SHARED CLASSES ---
 
@@ -427,6 +458,7 @@ class QuizQuestionWidget extends StatefulWidget {
 
 class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   int? selectedIndex;
+  bool showCorrectAnswer = false;
 
   @override
   Widget build(BuildContext context) {
@@ -451,12 +483,17 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
               final isSelected = selectedIndex == index;
               final isCorrect = index == widget.question.correctAnswerIndex;
               Color? tileColor;
+              IconData? icon;
 
-              if (selectedIndex != null && isSelected) {
+              if (selectedIndex != null) {
                 if (isCorrect) {
+                  // Prawidłowa odpowiedź - zielone tło z ikoną check
                   tileColor = Colors.green.withOpacity(0.9);
-                } else {
+                  icon = Icons.check;
+                } else if (isSelected) {
+                  // Błędna odpowiedź - czerwone tło z ikoną close
                   tileColor = Colors.redAccent.withOpacity(0.9);
+                  icon = Icons.close;
                 }
               }
 
@@ -469,6 +506,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
+                trailing: icon != null ? Icon(icon, color: Colors.white) : null,
                 onTap: selectedIndex == null
                     ? () {
                         setState(() {
@@ -479,6 +517,17 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                     : null,
               );
             }),
+            if (selectedIndex != null && selectedIndex != widget.question.correctAnswerIndex)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Correct answer: ${widget.question.options[widget.question.correctAnswerIndex]}',
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
