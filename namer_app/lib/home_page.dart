@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'login_page.dart';
+
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -6,7 +10,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5, // Gewijzigd van 4 naar 5
+      length: 5,
       child: MaterialApp(
         title: 'Tabbed App',
         theme: ThemeData(
@@ -30,7 +34,7 @@ class HomePage extends StatelessWidget {
           ),
           appBarTheme: const AppBarTheme(
             backgroundColor: Color.fromARGB(255, 2, 1, 90),
-            foregroundColor: Color(0xFFFFFFFF),
+            foregroundColor: const Color(0xFFFFFFFF),
             elevation: 0,
           ),
           tabBarTheme: TabBarTheme(
@@ -39,7 +43,7 @@ class HomePage extends StatelessWidget {
             indicatorColor: null,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-            labelPadding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+            labelPadding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 3.0),
             indicator: const BoxDecoration(
               color: Color(0xFFFFFFFF),
               borderRadius: BorderRadius.all(Radius.circular(16.0)),
@@ -76,13 +80,29 @@ class HomeTabController extends StatelessWidget {
               ),
               child: AppBar(
                 title: const Text('Your Local Quizzes'),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 55),
+                    child: IconButton(
+                      icon: const Icon(Icons.person),
+                      iconSize: 40,
+                      tooltip: 'Profile',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const UserProfilePage()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
                 bottom: const TabBar(
                   tabs: [
                     Tab(text: '  Movies  '),
                     Tab(text: '  Series  '),
                     Tab(text: '  Places  '),
                     Tab(text: '  Map  '),
-                    Tab(text: '  Streaming  '), // Nieuwe tab toegevoegd
+                    Tab(text: '  Streaming  '),
                   ],
                 ),
               ),
@@ -94,13 +114,13 @@ class HomeTabController extends StatelessWidget {
               SeriesPage(),
               PlacesPage(),
               MapPage(),
-              const StreamingPage(), // Nieuwe pagina toegevoegd
+              const StreamingPage(),
             ],
           ),
           backgroundColor: const Color(0xFFFFFFFF),
         ),
         Positioned(
-          top: 8,
+          top: 30, // Aangepaste waarde om uit te lijnen met titel en icoon
           right: 8,
           child: Image.asset(
             'assets/images/logo.png',
@@ -231,7 +251,7 @@ class _MovieTileState extends State<_MovieTile> {
   }
 }
 
-class MovieDetailPage extends StatefulWidget { // Zmieniono z StatelessWidget na StatefulWidget
+class MovieDetailPage extends StatefulWidget {
   final Movie movie;
 
   const MovieDetailPage({required this.movie, Key? key}) : super(key: key);
@@ -256,6 +276,12 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         quizCompleted = true;
       }
     });
+  }
+
+  void _navigateToTourTab() {
+    // Navigate to the Tour tab (index 3) while keeping the HomeTabController's app bar
+    DefaultTabController.of(context).animateTo(3); // Switch to Tour tab
+    Navigator.pop(context); // Pop MovieDetailPage to return to HomeTabController
   }
 
   @override
@@ -285,7 +311,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 color: Color(0xFF000000),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _navigateToTourTab,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFF030154),
+              ),
+              child: const Text('View Tour'),
+            ),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -308,12 +343,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               ],
             ),
             const SizedBox(height: 16),
-            // Pytania quizu
             ...widget.movie.quiz.map((q) => QuizQuestionWidget(
-              question: q,
-              onAnswerSelected: _handleAnswer,
-            )).toList(),
-            
+                  question: q,
+                  onAnswerSelected: _handleAnswer,
+                )),
             if (quizCompleted)
               Container(
                 margin: const EdgeInsets.only(top: 24),
@@ -380,12 +413,12 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
 
 class QuizQuestionWidget extends StatefulWidget {
   final QuizQuestion question;
-  final Function(bool isCorrect) onAnswerSelected; // Dodany callback
+  final Function(bool isCorrect) onAnswerSelected;
 
   const QuizQuestionWidget({
-    required this.question, 
-    required this.onAnswerSelected, // Wymagany nowy parametr
-    Key? key
+    required this.question,
+    required this.onAnswerSelected,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -454,6 +487,23 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
 }
 
 // --- TABS ---
+
+class MapPage extends StatelessWidget {
+  const MapPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: const Center(
+        child: Text(
+          'Map feature coming soon!',
+          style: TextStyle(fontSize: 22, color: Color(0xFF030154)),
+        ),
+      ),
+    );
+  }
+}
 
 class MoviePage extends StatelessWidget {
   MoviePage({super.key});
@@ -827,68 +877,275 @@ class PlacesPage extends StatelessWidget {
   }
 }
 
-class MapPage extends StatelessWidget {
-  const MapPage({super.key});
+class TourPage extends StatefulWidget {
+  final String? initialTour;
+
+  const TourPage({super.key, this.initialTour});
+
+  @override
+  State<TourPage> createState() => _TourPageState();
+}
+
+class _TourPageState extends State<TourPage> {
+  late String? selectedTour;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTour = null;
+  }
+
+  final Map<String, String> tours = {
+    'Porto': '',
+    'The Porto Affair': '',
+    'Love by the Douro': '',
+    'Porto Nights': ''
+  };
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size; // Get screen dimensions
     return Scaffold(
       body: SafeArea(
-        child: Image.network(
-          'https://cdn.shopify.com/s/files/1/0108/7363/4882/files/01_Porto_Portugal_Illustrated_Map.jpg?v=1677776828',
-          fit: BoxFit.cover,
-          width: size.width,
-          height: size.height,
-          errorBuilder: (context, error, stackTrace) => const Center(
-            child: Text(
-              'Failed to load image',
-              style: TextStyle(fontSize: 18, color: Colors.red),
-            ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Tour selection buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  alignment: WrapAlignment.center,
+                  children: tours.keys.map((tourName) {
+                    final isSelected = selectedTour == tourName;
+                    return ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          selectedTour = tourName;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: isSelected ? const Color(0xFF030154) : Colors.white,
+                        backgroundColor: isSelected ? const Color(0xFFffe648) : const Color(0xFF030154),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      child: Text(
+                        tourName,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              // Message indicating tours are coming soon
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Tours coming soon.',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
+      backgroundColor: const Color(0xFFFFFFFF),
     );
   }
 }
 
-// --- TABS ---
-
-class StreamingPage extends StatelessWidget {
+class StreamingPage extends StatefulWidget {
   const StreamingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Streaming'),
-      ),
-      body: const Center(
-        child: Text(
-          'Streaming content coming soon!',
-          style: TextStyle(fontSize: 18, color: Colors.black),
-        ),
+  State<StreamingPage> createState() => _StreamingPageState();
+}
+
+class _StreamingPageState extends State<StreamingPage> {
+  final List<Map<String, String>> videos = [
+    {
+      'title': '27 Tips I Wish I Knew Before Visiting Porto, Portugal',
+      'url': 'https://www.youtube.com/embed/ZK5TyUqk22M',
+    },
+    {
+      'title': 'FC Porto Stadium Tour',
+      'url': 'https://www.youtube.com/embed/ztPQ0CIFJtI',
+    },
+    {
+      'title': 'Porto 4K drone view',
+      'url': 'https://www.youtube.com/embed/7chyxBvCYd8',
+    },
+  ];
+
+  late YoutubePlayerController _controller;
+  String? selectedVideoId;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialUrl = videos[0]['url']!.trim();
+    selectedVideoId = YoutubePlayer.convertUrlToId(initialUrl);
+    _controller = YoutubePlayerController(
+      initialVideoId: selectedVideoId!,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        enableCaption: false,
+        showLiveFullscreenButton: false
       ),
     );
   }
-}
 
-class PlaceholderStreamingPage extends StatelessWidget {
-  const PlaceholderStreamingPage({super.key});
+  void _loadVideo(String url) {
+    final videoId = YoutubePlayer.convertUrlToId(url.trim());
+    if (videoId != null) {
+      setState(() {
+        selectedVideoId = videoId;
+        _controller.load(videoId);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          "I don't know what to do here yet",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black,
-                fontSize: 20,
+      backgroundColor: Colors.indigo[900], // dark blue background
+      appBar: AppBar(
+        backgroundColor: Colors.indigo[800],
+        title: const Text(
+          'Streaming',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Column(
+        children: [
+          YoutubePlayer(
+            controller: _controller,
+            showVideoProgressIndicator: true,
+            progressIndicatorColor: Colors.redAccent,
+            
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView.builder(
+              itemCount: videos.length,
+              itemBuilder: (context, index) {
+                final video = videos[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: ListTile(
+                    tileColor: Colors.indigo[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    title: Text(
+                      video['title']!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.play_arrow, color: Colors.white70),
+                    onTap: () => _loadVideo(video['url']!),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class UserProfilePage extends StatelessWidget {
+  const UserProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white, // białe tło całego ekranu
+      appBar: AppBar(
+        title: const Text('User Profile'),
+        backgroundColor: const Color(0xFF030154),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            // Kafelek z informacjami użytkownika na środku
+            Card(
+              color: const Color(0xFF030154), // zmieniamy tło kafelka na biały
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
+              elevation: 6,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Color(0xFFffe648), // kółko z ikoną na ten kolor
+                      child: Icon(Icons.person, size: 50, color: Color(0xFF030154)),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Name: John',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'E-mail: johndoe@example.com',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            // Przycisk wylogowania na dole, wycentrowany
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('Log out'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF030154),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      backgroundColor: const Color(0xFFFFFFFF),
     );
   }
 }

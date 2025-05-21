@@ -1,46 +1,12 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'home_page.dart'; // Make sure this file exports a class named HomePage
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Logging',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF030154),
-          primary: const Color(0xFF030154),
-          background: const Color(0xFFFFFFFF),
-          surface: const Color(0xFF030154),
-          onPrimary: const Color(0xFFFFFFFF),
-          onBackground: const Color(0xFF000000),
-        ),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Color(0xFFFFFFFF)),
-          titleLarge: TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            shadows: [Shadow(blurRadius: 2.0, color: Color(0xFF000000))],
-          ),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 2, 1, 90),
-          foregroundColor: Color(0xFFFFFFFF),
-          elevation: 0,
-        ),
-        cardTheme: CardTheme(
-          color: const Color(0xFF030154),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 6,
-        ),
-      ),
-      home: const LoginScreen(),
-    );
+    return const LoginScreen();
   }
 }
 
@@ -60,6 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isRegistering ? 'Registration' : 'Login page'),
+        backgroundColor: const Color(0xFF030154), // Blauwe AppBar
+        foregroundColor: Colors.white, // Witte tekst voor AppBar titel
       ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
@@ -128,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFffe648),
-                      foregroundColor: Colors.black,
+                      foregroundColor: Colors.white, // Witte tekst voor knop
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -146,7 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       }
                     },
-                    child: Text(isRegistering ? 'Register' : 'Login', style: const TextStyle(fontSize: 16)),
+                    child: Text(
+                      isRegistering ? 'Register' : 'Login',
+                      style: const TextStyle(fontSize: 16), // Style behouden
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextButton(
