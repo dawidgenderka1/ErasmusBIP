@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // Make sure this file exports a class named HomePage
-
+import 'home_page.dart';
+import 'child_page.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -19,19 +19,22 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isRegistering = false;
-  String selectedAccountType = 'Man';
+  String selectedGender = 'Man'; // MODIFIED
+  int Age = 20;
+  final TextEditingController ageController = TextEditingController(); // ADDED
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(isRegistering ? 'Registration' : 'Login page'),
-        backgroundColor: const Color(0xFF030154), // Blauwe AppBar
-        foregroundColor: Colors.white, // Witte tekst voor AppBar titel
+        backgroundColor: const Color(0xFF030154),
+        foregroundColor: Colors.white,
       ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Card(
             color: const Color(0xFF030154),
@@ -67,56 +70,74 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(color: Colors.white),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: selectedAccountType,
-                      dropdownColor: const Color(0xFF030154),
-                      decoration: _inputDecoration('Account Type'),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Man',
-                          child: Text('Man', style: TextStyle(color: Colors.white)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: selectedGender,
+                            dropdownColor: const Color(0xFF030154),
+                            decoration: _inputDecoration('Gender'), // MODIFIED
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Man',
+                                child: Text('Man', style: TextStyle(color: Colors.white)),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Woman',
+                                child: Text('Woman', style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedGender = value!;
+                              });
+                            },
+                          ),
                         ),
-                        DropdownMenuItem(
-                          value: 'Woman',
-                          child: Text('Woman', style: TextStyle(color: Colors.white)),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Child',
-                          child: Text('Child', style: TextStyle(color: Colors.white)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: ageController,
+                            keyboardType: TextInputType.number,
+                            decoration: _inputDecoration('Age'),
+                            style: const TextStyle(color: Colors.white),
+                            onChanged: (value) {
+                              try {
+                                Age = int.parse(value);
+                              } catch (e) {
+                                // Handle invalid input
+                                Age = 20; // or whatever default you prefer
+                              }
+                            },
+                            ),
                         ),
                       ],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedAccountType = value!;
-                        });
-                      },
                     ),
                   ],
                   const SizedBox(height: 24),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFffe648),
-                      foregroundColor: Colors.white, // Witte tekst voor knop
+                      foregroundColor: Colors.black, // MODIFIED
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
-                      if (!isRegistering) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
-                        );
-                      } else {
-                        // Obsługa rejestracji – np. zapis danych
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
-                        );
-                      }
+                      if (Age < 15) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChildPage()),
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                    }
                     },
                     child: Text(
                       isRegistering ? 'Register' : 'Login',
-                      style: const TextStyle(fontSize: 16), // Style behouden
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -126,9 +147,37 @@ class _LoginScreenState extends State<LoginScreen> {
                         isRegistering = !isRegistering;
                       });
                     },
-                    child: Text(
-                      isRegistering ? 'You are already registered? Log in' : 'You do not have an account? Register',
-                      style: const TextStyle(color: Color(0xFFFFFFFF)),
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        children: isRegistering
+                            ? [
+                                const TextSpan(text: 'You are already registered? '),
+                                const TextSpan(
+                                  text: 'Log in',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    decorationThickness: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ]
+                            : [
+                                const TextSpan(text: 'You do not have an account? '),
+                                const TextSpan(
+                                  text: 'Register',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    decorationThickness: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                      ),
                     ),
                   ),
                 ],

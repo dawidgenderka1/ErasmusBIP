@@ -6,8 +6,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+
+class ChildPage extends StatelessWidget {
+  const ChildPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class HomeTabController extends StatelessWidget {
                 ),
               ),
               child: AppBar(
-                title: const Text('Your Local Quizzes'),
+                title: const Text('Your Child Quizzes'),
                 actions: [
                   Padding(
                     padding: const EdgeInsets.only(right: 55),
@@ -100,8 +101,8 @@ class HomeTabController extends StatelessWidget {
                 ],
                 bottom: const TabBar(
                   tabs: [
-                    Tab(text: '  Movies  '),
-                    Tab(text: '  Series  '),
+                    Tab(text: '  Legends'),
+                    Tab(text: '  Education  '),
                     Tab(text: '  Places  '),
                     Tab(text: '  Map  '),
                     Tab(text: '  Streaming  '),
@@ -280,11 +281,6 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     });
   }
 
-  void _navigateToTourTab() {
-    // Navigate to the Tour tab (index 3) while keeping the HomeTabController's app bar
-    DefaultTabController.of(context).animateTo(3); // Switch to Tour tab
-    Navigator.pop(context); // Pop MovieDetailPage to return to HomeTabController
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,15 +309,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 color: Color(0xFF000000),
               ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _navigateToTourTab,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFF030154),
-              ),
-              child: const Text('View Tour'),
-            ),
+            
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -506,8 +494,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   }
 }
 
-// --- TABS ---
-
+// --- TABS ---//
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -517,7 +504,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
-  final LatLng _center = const LatLng(41.1579, -8.6291);
+  final LatLng _center = const LatLng(38.7167, -9.1333); // Lissabon als centrum van Portugal
   final Set<Marker> _markers = {};
 
   @override
@@ -566,25 +553,25 @@ class _MapPageState extends State<MapPage> {
         _markers.add(
           Marker(
             markerId: const MarkerId('custom_location'),
-            position: const LatLng(41.1399624945, -8.60946178436),
-            infoWindow: const InfoWindow(title: 'Bridge from the movie "Porto"'),
+            position: const LatLng(41.528428, -8.613590),
+            infoWindow: const InfoWindow(title: 'The Legend of the Rooster of Barcelos'),
             icon: customIcon,
           ),
         );
         // Voeg de nieuwe marker toe
         _markers.add(
           Marker(
-            markerId: const MarkerId('custom_location_porto_nights'),
-            position: const LatLng(41.140407, -8.613042),
-            infoWindow: const InfoWindow(title: 'Location from the movie "Porto Nights"'),
+            markerId: const MarkerId('custom_location_estrela'),
+            position: const LatLng(38.703640, -9.168070),
+            infoWindow: const InfoWindow(title: 'The Legend of the Serra da Estrela'),
             icon: customIcon,
           ),
         );
         _markers.add(
           Marker(
-            markerId: const MarkerId('Location from the movie "the porto affair".'),
-            position: const LatLng(41.145395, -8.678727),
-            infoWindow: const InfoWindow(title: 'Location from the movie "the porto affair".'),
+            markerId: const MarkerId('custom_location_Moorish_Maiden'),
+            position: const LatLng(41.143948, -8.655337),
+            infoWindow: const InfoWindow(title: 'The Legend of the Moorish Maiden'),
             icon: customIcon,
           ),
         );
@@ -604,8 +591,8 @@ class _MapPageState extends State<MapPage> {
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 12.0,
+          target: _center, // Centrum op Lissabon
+          zoom: 6.5, // Zoomniveau aangepast om heel Portugal te zien
         ),
         markers: _markers,
       ),
@@ -624,116 +611,156 @@ class MoviePage extends StatelessWidget {
 
   final List<Movie> movies = [
     Movie(
-      'Porto',
-      'https://m.media-amazon.com/images/S/pv-target-images/7bc5621e94413175ae2d0846c3a9d6f4e6e9c30128c5b8394c7a092942dbe3e6.jpg',
-      'A fleeting romance in Porto.',
-      'Porto (2016) is a romantic drama about a brief but intense love story set in the picturesque city of Porto.',
+      'The Legend of the Rooster of Barcelos',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/PA2900302_galo_emiliarocha_medio.jpg/1200px-PA2900302_galo_emiliarocha_medio.jpg',
+      'Portugese legend',
+      'A pilgrim is wrongly accused of theft and sentenced to hang. He declares that a roasted rooster will crow if he’s innocent—and it does, proving his innocence.',
       [
         QuizQuestion(
-          question: 'What is the main theme of the movie Porto?',
-          options: ['Action', 'Romance', 'Horror', 'Science Fiction'],
+          question: 'Why was the pilgrim in Barcelos accused of a crime?',
+          options: ['He stole money from the church.', 'He was mistaken for a thief who robbed a local farmer.', 'He refused to help the townspeople.', 'He insulted the judge.'],
           correctAnswerIndex: 1,
         ),
         QuizQuestion(
-          question: 'In which year was Porto released?',
-          options: ['2010', '2016', '2020', '2005'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'Which city is the setting for Porto?',
-          options: ['Lisbon', 'Madrid', 'Porto', 'Barcelona'],
+          question: 'What was the pilgrim doing when he was arrested?',
+          options: ['Praying at a church', 'Begging for food', 'On his way to Santiago de Compostela', 'Selling goods at the market'],
           correctAnswerIndex: 2,
         ),
         QuizQuestion(
-          question: 'Who directed the movie Porto?',
-          options: ['Gabe Klinger', 'Steven Spielberg', 'Quentin Tarantino', 'Christopher Nolan'],
+          question: 'Where was the roasted rooster when it miraculously crowed?',
+          options: ['In the town square', "On the judge's dinner table", 'At the execution site', "In the pilgrim's bag"],
+          correctAnswerIndex: 1,
+        ),
+        QuizQuestion(
+          question: 'What did the pilgrim create after being freed?',
+          options: ['The Cruzeiro do Senhor do Galo', 'A statue of the Virgin Mary', 'A painting of the miracle', 'A new church in Barcelos'],
           correctAnswerIndex: 0,
         ),
       ],
     ),
     Movie(
-      'The Porto Affair',
-      'https://static.spin.com/files/2019/05/Screen-Shot-2019-05-14-at-1.09.17-PM-1557853802.png',
-      'A mystery in Porto’s streets.',
-      'The Porto Affair (2020) is a fictional mystery film about a detective unraveling secrets in Porto’s historic district.',
+      'The Legend of the Serra da Estrela',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRK520mujTATtqoHzVEIQZTXsD_kToBwdYFbQ&s',
+      'Touching Portugese fairy tale',
+      'A shepherd falls in love with a star that descends from the sky. When he tries to reach her, she returns to the heavens, leaving behind the mountain range named in her honor.',
       [
         QuizQuestion(
-          question: 'What genre is The Porto Affair?',
-          options: ['Romance', 'Mystery', 'Comedy', 'Fantasy'],
+          question: "What was the shepherd's occupation?",
+          options: ['Blacksmith', 'Shepherd', 'Farmer', 'Miner'],
           correctAnswerIndex: 1,
         ),
         QuizQuestion(
-          question: 'In which year was The Porto Affair set?',
-          options: ['2015', '2020', '2010', '2025'],
+          question: 'How did the star first appear to the shepherd?',
+          options: ['As a bright light in the sky', 'As a voice in the wind', 'As a reflection in water', 'As a beautiful woman'],
+          correctAnswerIndex: 3,
+        ),
+        QuizQuestion(
+          question: 'What happened when the shepherd tried to touch the star?',
+          options: ['She turned into gold', ' She returned to the sky', 'She disappeared forever', 'She cursed himeacher'],
           correctAnswerIndex: 1,
         ),
         QuizQuestion(
-          question: 'What is the main profession of the protagonist in The Porto Affair?',
-          options: ['Chef', 'Detective', 'Artist', 'Teacher'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'Which Porto landmark is featured in The Porto Affair?',
-          options: ['Clérigos Tower', 'Eiffel Tower', 'Big Ben', 'Colosseum'],
+          question: 'What natural feature was created from this legend?',
+          options: ['A mountain range', 'A river', 'A lake', 'A forest'],
           correctAnswerIndex: 0,
         ),
       ],
     ),
     Movie(
-      'Love by the Douro',
-      'https://ilovedouro.pt/img/logo-i-love-douro.jpg',
-      'A love story along the Douro River.',
-      'Love by the Douro (2018) is a romantic film set along Porto’s Douro River, exploring love and cultural heritage.',
+      'The Enchanted Moorish Maiden',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2m74WXP6b22LFSCsrz71qJNFbNalH6Xztiw&s',
+      'A beautiful story about beautiful princess',
+      'A beautiful Moorish princess is cursed to live in a hidden cave, guarding a treasure. Only a pure-hearted knight can break the spell by resisting greed.',
       [
-        QuizQuestion(
-          question: 'What is the primary setting of Love by the Douro?',
-          options: ['Tagus River', 'Douro River', 'Seine River', 'Thames River'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What theme is central to Love by the Douro?',
-          options: ['Adventure', 'Love', 'War', 'Horror'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Love by the Douro released?',
-          options: ['2015', '2018', '2021', '2012'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'Which city is featured in Love by the Douro?',
-          options: ['Porto', 'Lisbon', 'Faro', 'Braga'],
-          correctAnswerIndex: 0,
-        ),
-      ],
+      QuizQuestion(
+        question: "What is the Moorish maiden guarding?",
+        options: [
+          'A sacred book',
+          'A treasure',
+          'A magic fountain',
+          'A royal crown'
+        ],
+        correctAnswerIndex: 1,
+      ),
+      QuizQuestion(
+        question: 'What is the condition to break the spell?',
+        options: [
+          'Solving a riddle',
+          'Resisting greed',
+          'Finding a golden key',
+          'Staying silent for a year'
+        ],
+        correctAnswerIndex: 1,
+      ),
+      QuizQuestion(
+        question: 'Where does the maiden live?',
+        options: [
+          'In a hidden cave',
+          'In an underwater palace',
+          'In a tower',
+          'In a magical forest'
+        ],
+        correctAnswerIndex: 0,
+      ),
+      QuizQuestion(
+        question: 'What happens if someone fails to break the spell?',
+        options: [
+          'They become stone',
+          'They join the maiden in guarding',
+          'They lose their memory',
+          'They become cursed'
+        ],
+        correctAnswerIndex: 3,
+      ),
+    ],
     ),
     Movie(
-      'Porto Nights',
-      'https://media.istockphoto.com/id/465130576/photo/port-portugal-skyline.jpg?s=612x612&w=0&k=20&c=MWThB1AbplZLqv7e8miuAa-Px1jMs6M5ih1qtHp5Uj0=',
-      'A drama under Porto’s lights.',
-      'Porto Nights (2019) is a drama about a group of friends navigating life and love in Porto’s vibrant nightlife.',
+      'The Miracle of the Roses',
+      'https://wp.en.aleteia.org/wp-content/uploads/sites/2/2017/11/web3-saint-elizabeth-of-hungary-chairty-for-poor-roses-public-domain.jpg',
+      'Story about loyality',
+      'Queen Isabel, secretly carrying bread for the poor, is confronted by her husband. When she opens her cloak, the bread has turned into roses, proving her virtue.',
       [
-        QuizQuestion(
-          question: 'What is the main setting of Porto Nights?',
-          options: ['Porto’s nightlife', 'Lisbon’s beaches', 'Madrid’s museums', 'Barcelona’s markets'],
-          correctAnswerIndex: 0,
-        ),
-        QuizQuestion(
-          question: 'What genre is Porto Nights?',
-          options: ['Sci-Fi', 'Drama', 'Comedy', 'Thriller'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Porto Nights released?',
-          options: ['2017', '2019', '2022', '2014'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What is a key theme in Porto Nights?',
-          options: ['Friendship', 'Time Travel', 'Espionage', 'Cooking'],
-          correctAnswerIndex: 0,
-        ),
-      ],
+  QuizQuestion(
+    question: "Who was Queen Isabel helping?",
+    options: [
+      'The royal court',
+      'The poor',
+      'Wounded soldiers',
+      'Orphaned children'
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: 'What was she secretly carrying?',
+    options: [
+      'Gold coins',
+      'Bread',
+      'Medicine',
+      'Important documents'
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: 'Who confronted her about her secret actions?',
+    options: [
+      'Her ladies-in-waiting',
+      'The king',
+      'The archbishop',
+      'The castle guards'
+    ],
+    correctAnswerIndex: 1,
+  ),
+  QuizQuestion(
+    question: 'What happened when she opened her cloak?',
+    options: [
+      'The bread turned to gold',
+      'The bread turned to roses',
+      'The bread disappeared',
+      'The bread multiplied'
+    ],
+    correctAnswerIndex: 1,
+  ),
+],
     ),
   ];
 
@@ -748,117 +775,117 @@ class SeriesPage extends StatelessWidget {
 
   final List<Movie> series = [
     Movie(
-      'Santiago’s Path',
-      'https://media.cntraveler.com/photos/578908eba3f6784a6a6125de/16:9/w_1280,c_limit/camino-de-santiago-trail-GettyImages-146582436.jpg',
-      'A spiritual journey in Porto.',
-      'Santiago’s Path (2022) is a series about pilgrims finding themselves in Porto, inspired by the Camino de Santiago.',
-      [
-        QuizQuestion(
-          question: 'What is the main focus of Santiago’s Path?',
-          options: ['Crime Investigation', 'Pilgrimage', 'Time Travel', 'Cooking Competition'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Santiago’s Path released?',
-          options: ['2018', '2020', '2022', '2024'],
-          correctAnswerIndex: 2,
-        ),
-        QuizQuestion(
-          question: 'Which city is a key setting in Santiago’s Path?',
-          options: ['Lisbon', 'Porto', 'Faro', 'Braga'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What inspired Santiago’s Path?',
-          options: ['World War II', 'Camino de Santiago', 'Industrial Revolution', 'Space Exploration'],
-          correctAnswerIndex: 1,
-        ),
-      ],
+  'Portuguese Numbers',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfdRGeZ1Ne0TU6mTGCAl6mey3ultvve2rxsQ&s',
+  'Learn how to count in Portuguese!',
+  'This quiz will test your understanding of numbers in Portuguese, from 1 to 10 and beyond.',
+  [
+    QuizQuestion(
+      question: 'How do you say "one" in Portuguese?',
+      options: ['Dois', 'Três', 'Um', 'Quatro'],
+      correctAnswerIndex: 2,
     ),
+    QuizQuestion(
+      question: 'What is the Portuguese word for "five"?',
+      options: ['Sete', 'Cinco', 'Nove', 'Dez'],
+      correctAnswerIndex: 1,
+    ),
+    QuizQuestion(
+      question: 'How is "ten" pronounced in Portuguese?',
+      options: ['Seis', 'Oito', 'Dez', 'Três'],
+      correctAnswerIndex: 2,
+    ),
+    QuizQuestion(
+      question: 'Which of these means "seven" in Portuguese?',
+      options: ['Sete', 'Quatro', 'Cinco', 'Dois'],
+      correctAnswerIndex: 0,
+    ),
+  ],
+),
     Movie(
-      'Porto Secrets',
-      'https://www.bespeaking.com/wp-content/uploads/2019/10/Secrets.jpg',
-      'A mystery in Porto’s alleys.',
-      'Porto Secrets (2021) is a mystery series about hidden histories uncovered in Porto’s old town.',
-      [
-        QuizQuestion(
-          question: 'What genre is Porto Secrets?',
-          options: ['Romance', 'Mystery', 'Comedy', 'Fantasy'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Porto Secrets released?',
-          options: ['2019', '2021', '2023', '2017'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What is the main setting of Porto Secrets?',
-          options: ['Porto’s old town', 'Lisbon’s markets', 'Madrid’s palaces', 'Barcelona’s beaches'],
-          correctAnswerIndex: 0,
-        ),
-        QuizQuestion(
-          question: 'What is uncovered in Porto Secrets?',
-          options: ['New species', 'Hidden histories', 'Alien artifacts', 'Lost recipes'],
-          correctAnswerIndex: 1,
-        ),
-      ],
+  'Animals in Portuguese',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn-KrgYGceicAfd2TulAH6OWdN1UX6KDlTog&s',
+  'Learn the names of animals in Portuguese!',
+  'This quiz covers common and unique animals found in Portugal and their Portuguese names.',
+  [
+    QuizQuestion(
+      question: 'What is "dog" in Portuguese?',
+      options: ['Gato', 'Cão', 'Pássaro', 'Peixe'],
+      correctAnswerIndex: 1,
     ),
+    QuizQuestion(
+      question: 'Which animal is called "lobo" in Portuguese?',
+      options: ['Fox', 'Wolf', 'Bear', 'Deer'],
+      correctAnswerIndex: 1,
+    ),
+    QuizQuestion(
+      question: 'What is the Portuguese word for "bird"?',
+      options: ['Cavalo', 'Pássaro', 'Vaca', 'Coelho'],
+      correctAnswerIndex: 1,
+    ),
+    QuizQuestion(
+      question: 'Which of these is the Iberian Lynx called in Portuguese?',
+      options: ['Lobo-Ibérico', 'Lince-Ibérico', 'Tigre-Português', 'Leão-da-Península'],
+      correctAnswerIndex: 1,
+    ),
+  ],
+),
     Movie(
-      'Douro Dreams',
-      'https://cf.bstatic.com/xdata/images/city/square250/971982.jpg?k=b65c557258d14ccaf06765683a26d8f2bc5088d751af34e0986923daa72eab98&o=',
-      'A family saga by the Douro.',
-      'Douro Dreams (2020) is a drama series about a family’s legacy along Porto’s Douro River.',
-      [
-        QuizQuestion(
-          question: 'What is the primary setting of Douro Dreams?',
-          options: ['Tagus River', 'Douro River', 'Seine River', 'Thames River'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What genre is Douro Dreams?',
-          options: ['Sci-Fi', 'Drama', 'Horror', 'Adventure'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Douro Dreams released?',
-          options: ['2018', '2020', '2022', '2016'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'What is the main focus of Douro Dreams?',
-          options: ['Space travel', 'Family legacy', 'Sports', 'Fashion'],
-          correctAnswerIndex: 1,
-        ),
-      ],
+  'Famous Portuguese Landmarks',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR3Gc77OF8A2hSUZQ62Irprw5RhiB2xKuCbA&s',
+  'Test your knowledge of Portugal’s most famous landmarks!',
+  'This quiz covers UNESCO sites, historic buildings, and natural wonders in Portugal.',
+  [
+    QuizQuestion(
+      question: 'Which famous tower is a symbol of Lisbon?',
+      options: ['Torre dos Clérigos', 'Torre dos Clérigos', 'Castelo de São Jorge', 'Ponte Vasco da Gama'],
+      correctAnswerIndex: 1,
     ),
-    Movie(
-      'Porto Lights',
-      'https://kinolorber.com/media_cache/userFiles/uploads/products/porto/full/738329229252.jpg',
-      'A coming-of-age story.',
-      'Porto Lights (2023) is a series about young adults finding their way in Porto’s vibrant cultural scene.',
-      [
-        QuizQuestion(
-          question: 'What is the main theme of Porto Lights?',
-          options: ['War', 'Coming-of-age', 'Espionage', 'Cooking'],
-          correctAnswerIndex: 1,
-        ),
-        QuizQuestion(
-          question: 'In which year was Porto Lights released?',
-          options: ['2020', '2021', '2023', '2019'],
-          correctAnswerIndex: 2,
-        ),
-        QuizQuestion(
-          question: 'Which city is central to Porto Lights?',
-          options: ['Porto', 'Lisbon', 'Coimbra', 'Faro'],
-          correctAnswerIndex: 0,
-        ),
-        QuizQuestion(
-          question: 'What is the cultural focus of Porto Lights?',
-          options: ['Technology', 'Vibrant cultural scene', 'Agriculture', 'Mining'],
-          correctAnswerIndex: 1,
-        ),
-      ],
+    QuizQuestion(
+      question: 'Where is the Instituto Superior Politécnico Gaya located?',
+      options: ['Porto', 'Braga', 'Vila Nova de Gaia', 'Faro'],
+      correctAnswerIndex: 2,
     ),
+    QuizQuestion(
+      question: 'Which Portuguese landmark is a medieval castle in Sintra?',
+      options: ['Palácio da Pena', 'Castelo dos Mouros', 'Mosteiro dos Jerónimos', 'Convento de Cristo'],
+      correctAnswerIndex: 1,
+    ),
+    QuizQuestion(
+      question: 'What is the name of Portugal’s longest bridge?',
+      options: ['Ponte 25 de Abril', 'Ponte Vasco da Gama', 'Ponte Dom Luís I', 'Ponte da Arrábida'],
+      correctAnswerIndex: 1,
+    ),
+  ],
+),
+Movie(
+  'Traditional Portuguese Dishes',
+  'https://media.posterlounge.com/img/products/770000/765525/765525_poster.jpg',
+  'How well do you know Portuguese food?',
+  'This quiz tests your knowledge of Portugal’s most famous dishes and ingredients.',
+  [
+    QuizQuestion(
+      question: 'What is "Bacalhau" in English?',
+      options: ['Pork', 'Sardines', 'Codfish', 'Octopus'],
+      correctAnswerIndex: 2,
+    ),
+    QuizQuestion(
+      question: 'Which dish is a famous Portuguese custard tart?',
+      options: ['Pastel de Nata', 'Bolo de Bolacha', 'Arroz Doce', 'Queijada'],
+      correctAnswerIndex: 0,
+    ),
+    QuizQuestion(
+      question: 'What is "Francesinha," a famous dish from Porto?',
+      options: ['A seafood stew', 'A sandwich with melted cheese and sauce', 'A type of sausage', 'A sweet pastry'],
+      correctAnswerIndex: 1,
+    ),
+    QuizQuestion(
+      question: 'Which soup is a traditional Portuguese bread soup?',
+      options: ['Caldo Verde', 'Açorda', 'Sopa da Pedra', 'Canja de Galinha'],
+      correctAnswerIndex: 1,
+    ),
+  ],
+),
   ];
 
   @override
@@ -1088,16 +1115,22 @@ class StreamingPage extends StatefulWidget {
 class _StreamingPageState extends State<StreamingPage> {
   final List<Map<String, String>> videos = [
     {
+      'title': 'The Legend of the Rooster of Barcelos ',
+      'url': 'https://www.youtube.com/embed/l0hcXUL6Mms',
+    },
+    {'title': 'The Legend of the Serra da Estrela ',
+      'url': 'https://www.youtube.com/embed/kkloCWhfiK4'},
+    {
+      'title': 'Numbers • Childrens First Words • Portuguese',
+      'url': 'https://www.youtube.com/embed/TwbXFMLptRQ',
+    },
+    {
+      'title': 'Farm animals • Childrens First Words • Portuguese',
+      'url': 'https://www.youtube.com/embed/wKxQDJNHJeo',
+    },
+    {
       'title': '27 Tips I Wish I Knew Before Visiting Porto, Portugal',
       'url': 'https://www.youtube.com/embed/ZK5TyUqk22M',
-    },
-    {
-      'title': 'FC Porto Stadium Tour',
-      'url': 'https://www.youtube.com/embed/ztPQ0CIFJtI',
-    },
-    {
-      'title': 'Porto 4K drone view',
-      'url': 'https://www.youtube.com/embed/7chyxBvCYd8',
     },
   ];
 
