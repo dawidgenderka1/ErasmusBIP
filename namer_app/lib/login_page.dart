@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'child_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -20,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool isRegistering = false;
   String selectedGender = 'Man'; // MODIFIED
+  int Age = 20;
   final TextEditingController ageController = TextEditingController(); // ADDED
 
   @override
@@ -98,9 +100,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: TextField(
                             controller: ageController,
                             keyboardType: TextInputType.number,
-                            decoration: _inputDecoration('Age'), // ADDED
+
+                            decoration: _inputDecoration('Age'),
                             style: const TextStyle(color: Colors.white),
-                          ),
+                            onChanged: (value) {
+                              try {
+                                Age = int.parse(value);
+                              } catch (e) {
+                                // Handle invalid input
+                                Age = 20; // or whatever default you prefer
+                              }
+                            },
+                            ),
                         ),
                       ],
                     ),
@@ -114,10 +125,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomePage()),
-                      );
+
+                      if (Age < 15) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChildPage()),
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                    }
+
                     },
                     child: Text(
                       isRegistering ? 'Register' : 'Login',
