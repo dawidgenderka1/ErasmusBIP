@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart'; // Make sure this file exports a class named HomePage
-
+import 'child_page.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -102,16 +102,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onPressed: () {
                       if (!isRegistering) {
+                        if(selectedAccountType=='Child'){
                         Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ChildPage()),
+                        );}
+                        else{
+                          Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const HomePage()),
                         );
+                        }
                       } else {
                         // Obsługa rejestracji – np. zapis danych
+                        if(selectedAccountType=='Child'){
                         Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ChildPage()),
+                        );}
+                        else{
+                          Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const HomePage()),
                         );
+                        }
                       }
                     },
                     child: Text(
