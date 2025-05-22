@@ -64,54 +64,55 @@ class ChildPage extends StatelessWidget {
   }
 }
 
-class HomeTabController extends StatelessWidget {
+class HomeTabController extends StatefulWidget {
   const HomeTabController({super.key});
+
+  @override
+  State<HomeTabController> createState() => _HomeTabControllerState();
+}
+
+class _HomeTabControllerState extends State<HomeTabController> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight + 56.0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color.fromARGB(255, 2, 1, 90),
-                  width: 6.0,
+          appBar: AppBar(
+            title: const Text('Your Local Quizzes'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 55),
+                child: IconButton(
+                  icon: const Icon(Icons.person),
+                  iconSize: 40,
+                  tooltip: 'Profile',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const UserProfilePage()),
+                    );
+                  },
                 ),
               ),
-              child: AppBar(
-                title: const Text('Your Child Quizzes'),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 55),
-                    child: IconButton(
-                      icon: const Icon(Icons.person),
-                      iconSize: 40,
-                      tooltip: 'Profile',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const UserProfilePage()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(text: '  Legends'),
-                    Tab(text: '  Education  '),
-                    Tab(text: '  Places  '),
-                    Tab(text: '  Map  '),
-                    Tab(text: '  Streaming  '),
-                  ],
-                ),
-              ),
-            ),
+            ],
+            backgroundColor: const Color.fromARGB(255, 2, 1, 90),
           ),
           body: TabBarView(
+            controller: _tabController,
             children: [
               MoviePage(),
               SeriesPage(),
@@ -120,10 +121,35 @@ class HomeTabController extends StatelessWidget {
               const StreamingPage(),
             ],
           ),
+          bottomNavigationBar: Container(
+  height: 48, // <-- wyższy pasek
+  color: const Color.fromARGB(255, 2, 1, 90),
+  child: TabBar(
+    controller: _tabController,
+    tabs: const [
+      Tab(icon: Icon(Icons.movie)),
+      Tab(icon: Icon(Icons.tv)),
+      Tab(icon: Icon(Icons.place)),
+      Tab(icon: Icon(Icons.map)),
+      Tab(icon: Icon(Icons.stream)),
+    ],
+    labelColor: Colors.yellow,
+    unselectedLabelColor: Colors.white,
+    indicator: UnderlineTabIndicator(
+      borderSide: BorderSide(width: 4.0, color: Colors.yellow),
+      insets: EdgeInsets.symmetric(horizontal: 24.0),
+    ),
+  ),
+),
+
+
+
+
+
           backgroundColor: const Color(0xFFFFFFFF),
         ),
         Positioned(
-          top: 30, // Aangepaste waarde om uit te lijnen met titel en icoon
+          top: 30,
           right: 8,
           child: Image.asset(
             'assets/images/logo.png',
@@ -134,6 +160,9 @@ class HomeTabController extends StatelessWidget {
       ],
     );
   }
+
+
+
 }
 
 // --- SHARED CLASSES ---
