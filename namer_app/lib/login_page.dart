@@ -20,9 +20,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isRegistering = false;
-  String selectedGender = 'Man'; // MODIFIED
+  String selectedGender = 'Man';
   int Age = 20;
-  final TextEditingController ageController = TextEditingController(); // ADDED
+  final TextEditingController ageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,16 @@ class _LoginScreenState extends State<LoginScreen> {
         title: Text(isRegistering ? 'Registration' : 'Login page'),
         backgroundColor: const Color(0xFF030154),
         foregroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1, right: 8),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 50,
+              height: 50,
+            ),
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
@@ -77,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: DropdownButtonFormField<String>(
                             value: selectedGender,
                             dropdownColor: const Color(0xFF030154),
-                            decoration: _inputDecoration('Gender'), // MODIFIED
+                            decoration: _inputDecoration('Gender'),
                             items: const [
                               DropdownMenuItem(
                                 value: 'Man',
@@ -100,18 +110,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: TextField(
                             controller: ageController,
                             keyboardType: TextInputType.number,
-
                             decoration: _inputDecoration('Age'),
                             style: const TextStyle(color: Colors.white),
                             onChanged: (value) {
                               try {
                                 Age = int.parse(value);
                               } catch (e) {
-                                // Handle invalid input
-                                Age = 20; // or whatever default you prefer
+                                Age = 20;
                               }
                             },
-                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -120,24 +128,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFffe648),
-                      foregroundColor: Colors.black, // MODIFIED
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
-
                       if (Age < 15) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ChildPage()),
-                  );
-                } else {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                    }
-
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ChildPage()),
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomePage()),
+                        );
+                      }
                     },
                     child: Text(
                       isRegistering ? 'Register' : 'Login',

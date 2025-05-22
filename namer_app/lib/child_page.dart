@@ -149,7 +149,7 @@ class _HomeTabControllerState extends State<HomeTabController> with TickerProvid
           backgroundColor: const Color(0xFFFFFFFF),
         ),
         Positioned(
-          top: 30,
+          top: 25,
           right: 8,
           child: Image.asset(
             'assets/images/logo.png',
